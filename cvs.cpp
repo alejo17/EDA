@@ -65,6 +65,42 @@ struct cvs
         }
     }
 
+
+	void create_path(string start_state, string end_state)
+    {   
+        Tpath new_ = new struct path;
+        Tstate aux, aux2;
+     
+        if(root == NULL)
+            return;
+        
+        new_->next = NULL;
+        aux = root;
+        aux2 = root;
+     
+        if (aux->status!=-1 and aux2->status!=-1)
+        {
+            while(aux2 != NULL)
+            {
+                if(aux2->tag == end_state)
+                {
+                    break;
+                }
+                aux2 = aux2->next;
+            }
+
+            while(aux != NULL)
+            {
+                if(aux->tag == start_state)
+                {
+                    add_path(aux, aux2, new_);
+                    return;
+                }
+                aux = aux->next;
+            }
+        }
+    }
+
      
     void add_path(Tstate &aux, Tstate &aux2, Tpath &new_)
     {
@@ -88,43 +124,7 @@ struct cvs
                 temp->next = new_;
             }
         }
-    }
-
-
-    void create_path(string start, string end)
-    {   
-        Tpath new_ = new struct path;
-        Tstate aux, aux2;
-     
-        if(root == NULL)
-            return;
-        
-        new_->next = NULL;
-        aux = root;
-        aux2 = root;
-     
-        if (aux->status!=-1 and aux2->status!=-1)
-        {
-            while(aux2 != NULL)
-            {
-                if(aux2->tag == end)
-                {
-                    break;
-                }
-                aux2 = aux2->next;
-            }
-
-            while(aux != NULL)
-            {
-                if(aux->tag == start)
-                {
-                    add_path(aux, aux2, new_);
-                    return;
-                }
-                aux = aux->next;
-            }
-        }
-    }
+    }  
      
 
     void print()
@@ -154,7 +154,7 @@ struct cvs
     }
 
 
-    void find_path(string x)
+    void find_path(string state)
     {
         Tstate aux;
         Tpath path_;
@@ -163,7 +163,7 @@ struct cvs
 
         while(aux != NULL)
         {
-            if(aux->tag == x)
+            if(aux->tag == state)
             {
                 if(aux->list == NULL)
                     return;
@@ -187,7 +187,39 @@ struct cvs
     }
 
 
-    string print_lista()
+ 	void delete_state(string state)
+    {
+        Tstate aux;
+        Tpath path_;
+
+        aux = root;
+
+        while(aux != NULL)
+        {
+            if(aux->tag == state)
+            {
+                if(aux->list == NULL){
+                    aux->status = -1;
+                }
+                else
+                {
+                    aux->status = -1;
+                    path_ = aux->list;
+                    
+                    while(path_ != NULL)
+                    {
+                        path_->arrival_state->status= -1;
+                        delete_state(path_->arrival_state->tag);
+                        path_ = path_->next;
+                    }
+                }
+            }
+            aux = aux->next;
+        }
+    }
+
+
+    string print_list()
     {
         Tstate ptr;
         Tpath path_;
@@ -215,7 +247,7 @@ struct cvs
     }
 
 
-    string print_estado()
+    string print_state()
     {
         Tstate ptr;
         Tpath path_;
@@ -237,35 +269,14 @@ struct cvs
     }
 
 
-    void delete_state(string x)
+    void write_graph()
     {
-        Tstate aux;
-        Tpath path_;
+        ofstream fs("grafo.dot");
+        fs << "digraph {\n" << print_state() <<"\n\n"<< print_list() << "\n}";
+        fs.close();
 
-        aux = root;
-
-        while(aux != NULL)
-        {
-            if(aux->tag == x)
-            {
-                if(aux->list == NULL){
-                    aux->status = -1;
-                }
-                else
-                {
-                    aux->status = -1;
-                    path_ = aux->list;
-                    
-                    while(path_ != NULL)
-                    {
-                        path_->arrival_state->status= -1;
-                        delete_state(path_->arrival_state->tag);
-                        path_ = path_->next;
-                    }
-                }
-            }
-            aux = aux->next;
-        }
+        system("dot -Tpng grafo.dot -o grafo.png");
+        system("eog grafo.png");
     }
 
 
@@ -277,6 +288,36 @@ struct cvs
         tstruct = *localtime(&now);
         strftime(buf, sizeof(buf), "%Y/%m/%d %X", &tstruct);
         return buf;
+    }
+
+
+    void merge(string start_state, string end_state)
+    {
+        Tstate aux, aux2;
+     
+        if(root == NULL)
+            return;
+        
+        aux = root;
+        aux2 = root;
+     
+        while(aux2 != NULL)
+        {
+            if(aux2->tag == end_state)
+            {
+                break;
+            }
+            aux2 = aux2->next;
+        }
+
+        while(aux != NULL)
+        {
+            if(aux->tag == start_state)
+            {
+                merge_files(aux, aux2);
+            }
+            aux = aux->next;
+        }
     }
 
 
@@ -314,53 +355,9 @@ struct cvs
     }
 
 
-    void merge(string start, string end)
-    {
-        Tpath new_ = new struct path;
-        Tstate aux, aux2;
-     
-        if(root == NULL)
-            return;
-        
-        new_->next = NULL;
-        aux = root;
-        aux2 = root;
-     
-        while(aux2 != NULL)
-        {
-            if(aux2->tag == end)
-            {
-                break;
-            }
-            aux2 = aux2->next;
-        }
-
-        while(aux != NULL)
-        {
-            if(aux->tag == start)
-            {
-                merge_files(aux, aux2);
-            }
-            aux = aux->next;
-        }
-    }
-
-
-    void write_graph()
-    {
-        ofstream fs("grafo.dot");
-        fs << "digraph {\n" << print_estado() <<"\n\n"<< print_lista() << "\n}";
-        fs.close();
-
-        system("dot -Tpng grafo.dot -o grafo.png");
-        system("eog grafo.png");
-    }
-
-
     void restore(string tiempo)
     {
         Tstate ptr;
-        Tpath path_;
         ptr = root;
          
         while(ptr!=NULL)
@@ -370,6 +367,38 @@ struct cvs
                 delete_state(ptr->tag);
             }
             ptr = ptr->next;       
+        }
+    }
+
+
+    void restore_state(string state)
+    {
+        Tstate aux;
+        Tpath path_;
+
+        aux = root;
+
+        while(aux != NULL)
+        {
+            if(aux->tag == state)
+            {
+                if(aux->list == NULL){
+                    aux->status = 1;
+                }
+                else
+                {
+                    aux->status = 1;
+                    path_ = aux->list;
+                    
+                    while(path_ != NULL)
+                    {
+                        path_->arrival_state->status= -1;
+                        restore_state(path_->arrival_state->tag);
+                        path_ = path_->next;
+                    }
+                }
+            }
+            aux = aux->next;
         }
     }
 };
@@ -398,7 +427,7 @@ int main(void)
     cvs->add_state("1",1,"ale1",cvs->date_time(),fi1);
     cvs->add_state("2",0,"ale2",cvs->date_time(),fi2);
     cvs->add_state("3",2,"ale3",cvs->date_time(),fi3);
-    cvs->add_state("4",0,"ale4",cvs->date_time(),fi4);
+    cvs->add_state("4",0,"ale4",cvs->date_time(),fi4);        
     cvs->add_state("5",2,"ale5",cvs->date_time(),fi5);
     cvs->add_state("6",0,"ale6",cvs->date_time(),fi6);
     cvs->add_state("7",0,"ale7",cvs->date_time(),fi2);
@@ -416,14 +445,14 @@ int main(void)
     cvs->create_path("6","7");    
     cvs->create_path("1","8");  
     cvs->create_path("4","9");    
-        
+    
     cvs->delete_state("3");
 
     cvs->merge("7","10");
     cvs->merge("8","6");
 
     sleep(5);
-    
+
     cvs->add_state("00",3,"ale0",cvs->date_time(),fi);
     cvs->add_state("11",4,"ale1",cvs->date_time(),fi1);
     cvs->add_state("22",3,"ale2",cvs->date_time(),fi);
@@ -452,8 +481,9 @@ int main(void)
 
     cvs->merge("22","33");
 
-    string a="2017/07/09 18:39:05";
+    string a="2017/07/10 08:24:04";
     cvs->restore(a);
+    cvs->restore_state("3");    
 
     cvs->add_state("111",7,"ale7",cvs->date_time(),fi6);
     cvs->add_state("112",7,"ale7",cvs->date_time(),fi6);
@@ -470,7 +500,6 @@ int main(void)
     cvs->delete_state("112"); 
 
     cvs->write_graph(); 
-
     
     return 0;
 }
