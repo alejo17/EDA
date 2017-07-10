@@ -1,0 +1,67 @@
+digraph {
+
+	0[label=" 0  status: 1 master";];
+	1[label=" 1  status: 1 branch: 1";];
+	2[label=" 2  status: 1 master";];
+	3[label=" 3  status: -1 branch: 2";];
+	4[label=" 4  status: 1 master";];
+	5[label=" 5  status: -1 branch: 2";];
+	6[label=" 6  status: 1 master";];
+	7[label=" 7  status: 1 master";];
+	8[label=" 8  status: 1 branch: 1";];
+	9[label=" 9  status: 1 branch: 3";];
+	10[label=" 10  status: 1 branch: 3";];
+	m0[label=" m0  status: 1 master";];
+	m1[label=" m1  status: 1 branch: 1";];
+	00[label=" 00  status: 1 branch: 3";];
+	11[label=" 11  status: 1 branch: 4";];
+	22[label=" 22  status: 1 branch: 3";];
+	33[label=" 33  status: 1 branch: 5";];
+	44[label=" 44  status: -1 branch: 3";];
+	55[label=" 55  status: 1 branch: 4";];
+	66[label=" 66  status: -1 branch: 3";];
+	77[label=" 77  status: -1 branch: 3";];
+	88[label=" 88  status: 1 branch: 4";];
+	99[label=" 99  status: -1 branch: 6";];
+	100[label=" 100  status: -1 branch: 6";];
+	m2[label=" m2  status: 1 branch: 3";];
+	111[label=" 111  status: 1 branch: 7";];
+	112[label=" 112  status: -1 branch: 7";];
+	113[label=" 113  status: -1 branch: 7";];
+	114[label=" 114  status: -1 branch: 7";];
+	115[label=" 115  status: -1 branch: 7";];
+
+	0 -> 2
+	0 -> 3
+	0 -> 1
+	1 -> 8
+	2 -> 4
+	3 -> 5
+	4 -> 6
+	4 -> 9
+	6 -> 7
+	6 -> m1
+	7 -> m0
+	8 -> m1
+	9 -> 10
+	10 -> m0
+	10 -> 00
+	10 -> 111
+	00 -> 22
+	00 -> 11
+	11 -> 88
+	22 -> 33
+	22 -> 44
+	22 -> m2
+	33 -> m2
+	44 -> 66
+	44 -> 99
+	66 -> 77
+	88 -> 55
+	99 -> 100
+	111 -> 112
+	112 -> 113
+	113 -> 114
+	114 -> 115
+
+}
